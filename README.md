@@ -1,1 +1,2 @@
-# event-driven-app
+# EDP
+Event Driven Programming Projects
