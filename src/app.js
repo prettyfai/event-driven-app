@@ -62,30 +62,18 @@ const App = () => {
       .catch(error => console.error('Error adding task:', error));
   };
 
-  function onClick(id) {
-    const taskExists = tasks.some(task => task.id === id);
-  
-    if (taskExists) {
-      handleDeleteTask(id);
-    } else {
-      console.error(`Task with id ${id} does not exist.`);
-    }
-  }
-
-  // Delete a task by its id
-  const handleDeleteTask = async (idToDelete) => {
-    try {
-      // Make a DELETE request to the API endpoint
-      await axios.delete(`http://localhost:3000/to-do-list/${idToDelete}`);
-      
-      // Remove the deleted task from the tasks state
-      setTasks(tasks.filter(task => task.id !== idToDelete));
-      
-      console.log(`Task with id ${idToDelete} deleted successfully.`);
-    } catch (error) {
-      console.error('Error deleting task:', error);
-    }
+  const handleDeleteTask = (id) => {
+    const updatedTasks = tasks.filter((_, i) => i !== id);
+    fetch('http://localhost:3000/to-do-list/{$id}', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: taskInput }),
+    })
+    setTasks(updatedTasks);
   };
+
 
   return (
     <div>
@@ -102,16 +90,17 @@ const App = () => {
         </button>
       </div>
       <ul>
-        {tasks.map(task => (
-          <li key={task.id}>
-            {task.name}
-            <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
-          </li>
-        ))}
+      {tasks.map((task, id) => (
+        <li key={id}>
+          {task.name}
+          <button onClick={() => handleDeleteTask(id)} className="delete-button">
+            Delete
+          </button>
+        </li>
+      ))}
       </ul>
     </div>
   );
-  
 };
 
 export default App;
