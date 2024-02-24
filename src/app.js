@@ -25,21 +25,12 @@ const App = () => {
       })
       .catch(error => console.error('Error fetching data:', error));
   };
-  // const fetchTasks = async () => {
-  //   try {
-  //     const response = await axios.get('http://localhost:3000/to-do-list');
-  //     console.log(response.data);
-  //     // setTasks(response.data);
-  //     setTasks(response.data.tasks)
-  //   } catch (error) {
-  //     console.error('Error fetching tasks:', error);
-  //   }
-  // };
 
   const handleInputChange = (event) => {
     setTaskInput(event.target.value);
   };
 
+  // Add task to the list
   const handleAddTask = () => {
     if (!taskInput.trim()) return;
     fetch('http://localhost:3000/to-do-list', {
@@ -87,6 +78,48 @@ const App = () => {
     }
   };
 
+  // Added edit function of the task list item with button edit beside the delete button
+  // edit a task by its id with prompt modal
+
+  // const handleEditTask = async (idToEdit) => {
+  //   try {
+  //     // Make a PUT request to the API endpoint
+  //     await axios.put(`http://localhost:3000/to-do-list/${idToEdit}`);
+      
+  //     // Remove the edited task from the tasks state
+  //     setTasks(tasks.filter(task => task.id !== idToEdit));
+      
+  //     console.log(`Task with id ${idToEdit} edited successfully.`);
+  //   } catch (error) {
+  //     console.error('Error editing task:', error);
+  //   }
+  // };
+
+  const handleEditTask = async (idToEdit) => {
+    try {
+      // Find the task with the given ID
+      const taskToEdit = tasks.find(task => task.id === idToEdit);
+
+      // Prompt the user for the new task name, with the current name as the default value
+      const newTaskName = prompt('Edit task:', taskToEdit.name);
+
+      // Naay bug dire, so if the user cancelled the prompt, don't proceed with the edit
+      if (newTaskName === null) {
+        return;
+      }
+
+      // Make a PUT request to the API endpoint
+      await axios.put(`http://localhost:3000/to-do-list/${idToEdit}`, { name: newTaskName });
+
+      // Update the task in the tasks state
+      setTasks(tasks.map(task => task.id === idToEdit ? { ...task, name: newTaskName } : task));
+
+      console.log(`Task with id ${idToEdit} edited successfully.`);
+    } catch (error) {
+      console.error('Error editing task:', error);
+    }
+  };
+
   return (
     <div>
       <div>
@@ -100,12 +133,19 @@ const App = () => {
         <button className="add-button" onClick={handleAddTask}>
           Add Task
         </button>
+        {/* <div class="tasks-lists-container">
+          <div class="task-names">Task</div>
+           <div class="task-actions">Action</div>
+        </div> */}
       </div>
       <ul>
         {tasks.map(task => (
           <li key={task.id}>
             {task.name}
-            <button onClick={() => handleDeleteTask(task.id)}>Delete</button>
+            <div class="tasks-lists-container">
+            <button className="edit-button" onClick={() => handleEditTask(task.id)}>Edit</button>
+            <button className="delete-button" onClick={() => handleDeleteTask(task.id)}>Delete</button>
+            </div>
           </li>
         ))}
       </ul>
